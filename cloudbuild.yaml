@@ -1,37 +1,40 @@
-images: 
-  - "gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}"
-options: 
-  substitution_option: ALLOW_LOOSE
-steps: 
-  - 
-    args: 
-      - build
-      - "-t"
-      - "gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}"
-      - "."
-    name: gcr.io/cloud-builders/docker
-  - 
-    args: 
-      - push
-      - "gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}"
-    name: gcr.io/cloud-builders/docker
-  - 
-    args: 
-      - beta
-      - run
-      - deploy
-      - "--allow-unauthenticated"
-      - "${_CLOUD_RUN_SERVICE}"
-      - "--image"
-      - "gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}"
-      - "--region"
-      - us-central1
-      - "--platform"
-      - managed
-      - "--memory"
-      - 256Mi
-      - "--update-env-vars"
-      - "APP_DEBUG=${_APP_DEBUG}"
-    name: gcr.io/cloud-builders/gcloud
-substitutions: 
-  _APP_DEBUG: "true"
+steps:
+  # build the container image
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build', 
+    '-t', 
+    'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}', 
+    '.'
+    ]
+  # push the container image to Container Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}']
+  # Deploy container image to Cloud Run
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+    'beta',
+    'run',
+    'deploy',
+    '--allow-unauthenticated',
+    '${_CLOUD_RUN_SERVICE}',
+    '--image',
+    'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}',
+    '--region',
+    'us-central1',
+    '--platform',
+    'managed',
+    '--memory',
+    '256Mi',
+    '--update-env-vars',
+    'APP_DEBUG=${_APP_DEBUG}'
+    ]
+images:
+- gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}
+
+options:
+    substitution_option: 'ALLOW_LOOSE'
+    logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+    _APP_DEBUG: 'true'
