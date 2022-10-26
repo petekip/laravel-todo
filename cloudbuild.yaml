@@ -21,7 +21,7 @@ steps:
     '--image',
     'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}',
     '--region',
-    'us-central1',
+    '[REGION]',
     '--platform',
     'managed',
     '--memory',
