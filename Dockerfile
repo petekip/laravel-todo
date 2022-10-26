@@ -1,4 +1,4 @@
-#Import the image with basic ubuntu system and php along with extensions installed.
+#Import the image with basic ubuntu system and php along with extensions installed. PHP 8.1
 FROM php:8.1-apache
 
 # Copy local code to the container image.
