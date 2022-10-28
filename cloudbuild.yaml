@@ -27,8 +27,7 @@ steps:
     '--memory',
     '256Mi',
     '--network',
-    'cloudbuild'
-    --network=cloudbuild
+    'cloudbuild',
     '--update-env-vars',
     'APP_DEBUG=${_APP_DEBUG}'
     ]
