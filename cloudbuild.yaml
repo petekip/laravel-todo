@@ -1,35 +1,32 @@
 steps:
-- name: 'gcr.io/cloud-builders/gsutil'
-  args:
-    - cp
-    - .env.testing
-    - .env
-- name: 'docker/compose:1.23.1'
-  args:
-    - run
-    - app
-    - composer
-    - install
-    - --optimize-autoloader
-    - --no-interaction
-    - --no-ansi
-    - --no-progress
-    - --no-scripts
-    - --prefer-dist
-- name: 'docker/compose:1.23.1'
-  args:
-    - run
-    - app
-    - vendor/bin/phpunit
-    - --no-coverage
-- name: 'gcr.io/cloud-builders/gsutil'
-  args:
-    - cp
-    - ${_APP_YAML_CONFIG}
-    - app.yaml
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-    - app
-    - deploy
-    - --no-promote
-timeout: '600s'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcloud-slim','--tag=gcr.io/$PROJECT_ID/gcloud-slim','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim', '-f', 'Dockerfile.slim', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud', '-f', 'Dockerfile', '.']
+
+# Simple sanity check: invoke the new gcloud container to confirm that it was
+# built correctly.
+- name: 'gcr.io/$PROJECT_ID/gcloud'
+  args: ['info']
+- name: 'gcr.io/$PROJECT_ID/gcloud-slim'
+  args: ['info']
+
+# Confirm that auth is piped through correctly.
+- name: 'gcr.io/$PROJECT_ID/gcloud'
+  args: ['builds', 'list']
+
+images:
+- 'gcr.io/$PROJECT_ID/gcloud'
+- 'gcr.io/$PROJECT_ID/gcloud-slim'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
+- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
+- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
+- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
+
+options:
+    substitution_option: 'ALLOW_LOOSE'
+    logging: CLOUD_LOGGING_ONLY
+
+timeout: 2400s
