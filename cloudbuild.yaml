@@ -16,20 +16,17 @@ steps:
     'beta',
     'run',
     'deploy',
-    '--allow-unauthenticated',
-    '${_CLOUD_RUN_SERVICE}',
     '--image',
     'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}',
-    '--region',
-    'us-central1',
-    '--platform',
-    'managed',
-    '--memory',
-    '256Mi',
-    '--network',
-    'cloudbuild',
     '--update-env-vars',
     'APP_DEBUG=${_APP_DEBUG}'
     ]
 images:
 - gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}
+
+options:
+    substitution_option: 'ALLOW_LOOSE'
+    logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+    _APP_DEBUG: 'true'
