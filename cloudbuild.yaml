@@ -14,7 +14,7 @@
    - '--image'
    - 'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}:$COMMIT_SHA'
    - '--region'
-   - '[REGION]'
+   - 'us-central1'
  images:
  - 'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}:$COMMIT_SHA'
 
