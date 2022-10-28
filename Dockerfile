@@ -1,36 +1,29 @@
-#Import the image with basic ubuntu system and php along with extensions installed.
-FROM php:8.1-apache
+FROM composer:2.0 as build
+WORKDIR /app
+COPY . /app
+RUN composer install --no-scripts --no-autoloader && \
+    composer dump-autoload --optimize
 
-# Copy local code to the container image.
-COPY . /var/www/html/
+FROM php:7.3-apache-stretch
 
-# Restart apache2
-RUN service apache2 restart
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+    mysql-client
 
-# Use the PORT environment variable in Apache configuration files.
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
+RUN docker-php-ext-install pdo pdo_mysql mysqli
 
+EXPOSE 8080
+COPY --from=build /app /var/www/
+COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 
-# Authorise .htaccess files
-RUN sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+RUN  chown -R www-data:www-data /var/www/;
+RUN  find /var/www/ -type f -exec chmod 644 {} \;
+RUN  find /var/www/ -type d -exec chmod 755 {} \;
 
-RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-COPY .env.example .env
-
-ARG GOOGLE_CLOUD_PROJECT
-
-RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
-
-# Install composer packages
-RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
-RUN apk update
-RUN apk upgrade
-RUN apk add bash
-RUN alias composer='php /usr/bin/composer'
-
-RUN chown -R www-data:www-data storage bootstrap
-RUN chmod -R 777 storage bootstrap
-
-RUN php artisan key:generate
+RUN cd /var/www/ && \
+    mv .env.example .env && \
+    php artisan key:generate && \
+    chgrp -R www-data storage bootstrap/cache && \
+    chmod -R ug+rwx storage bootstrap/cache && \
+    echo "Listen 8080" >> /etc/apache2/ports.conf && \
+    a2enmod rewrite
