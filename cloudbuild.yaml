@@ -36,6 +36,7 @@ images:
 
 options:
     substitution_option: 'ALLOW_LOOSE'
+    logging: CLOUD_LOGGING_ONLY
 
 substitutions:
     _APP_DEBUG: 'true'
