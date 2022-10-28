@@ -1,4 +1,42 @@
 steps:
-  - name : 'gcr.io/cloud-builders/docker'
-    args: ["build",  "-t", 'gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA',"."]
-  images: ['gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA']
+  # build the container image
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build', 
+    '-t', 
+    'gcr.io/$PROJECT_ID/${SHORT_SHA}', 
+    '.'
+    ]
+  # push the container image to Container Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/${SHORT_SHA}']
+  # Deploy container image to Cloud Run
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+    'beta',
+    'run',
+    'deploy',
+    '--allow-unauthenticated',
+    '${SHORT_SHA}',
+    '--image',
+    'gcr.io/$PROJECT_ID/${SHORT_SHA}',
+    '--region',
+    'us-central1',
+    '--platform',
+    'managed',
+    '--memory',
+    '256Mi',
+    '--network',
+    'cloudbuild',
+    '--update-env-vars',
+    'APP_DEBUG=${_APP_DEBUG}'
+    ]
+images:
+- gcr.io/$PROJECT_ID/${SHORT_SHA}
+
+options:
+    substitution_option: 'ALLOW_LOOSE'
+    logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+    _APP_DEBUG: 'true'
