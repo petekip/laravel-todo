@@ -12,15 +12,8 @@ steps:
   args: ['push', 'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}']
   # Deploy container image to Cloud Run
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: [
-    'beta',
-    'run',
-    'deploy',
-    '--image',
-    'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}',
-    '--update-env-vars',
-    'APP_DEBUG=${_APP_DEBUG}'
-    ]
+  args: ['deploy',
+    'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}']
 images:
 - gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}
 
