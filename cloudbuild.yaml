@@ -26,6 +26,8 @@ steps:
     'managed',
     '--memory',
     '256Mi',
+    '--network',
+    'cloudbuild',
     '--update-env-vars',
     'APP_DEBUG=${_APP_DEBUG}'
     ]

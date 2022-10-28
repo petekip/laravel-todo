@@ -1,4 +1,4 @@
-#Import the image with basic ubuntu system and php along with extensions installed. PHP 8.1
+#Import the image with basic ubuntu system and php along with extensions installed.
 FROM php:8.1-apache
 
 # Copy local code to the container image.
@@ -24,7 +24,11 @@ ARG GOOGLE_CLOUD_PROJECT
 RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
 
 # Install composer packages
-RUN composer install -n --prefer-dist
+RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
+RUN apk update
+RUN apk upgrade
+RUN apk add bash
+RUN alias composer='php /usr/bin/composer'
 
 RUN chown -R www-data:www-data storage bootstrap
 RUN chmod -R 777 storage bootstrap
