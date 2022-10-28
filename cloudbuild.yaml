@@ -12,7 +12,7 @@ steps:
   args: ['push', 'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}']
   # Deploy container image to Cloud Run
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['deploy',
+  args: ['tag',
     'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}']
 images:
 - gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}
