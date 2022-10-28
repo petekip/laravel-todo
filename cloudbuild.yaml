@@ -17,3 +17,7 @@
    - '[REGION]'
  images:
  - 'gcr.io/$PROJECT_ID/[SERVICE-NAME]:$COMMIT_SHA'
+
+ options:
+    substitution_option: 'ALLOW_LOOSE'
+    logging: CLOUD_LOGGING_ONLY
