@@ -1,32 +1,5 @@
 steps:
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcloud-slim','--tag=gcr.io/$PROJECT_ID/gcloud-slim','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim', '-f', 'Dockerfile.slim', '.']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/gcloud','--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud','--tag=asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud','--tag=us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud', '-f', 'Dockerfile', '.']
-
-# Simple sanity check: invoke the new gcloud container to confirm that it was
-# built correctly.
-- name: 'gcr.io/$PROJECT_ID/gcloud'
-  args: ['info']
-- name: 'gcr.io/$PROJECT_ID/gcloud-slim'
-  args: ['info']
-
-# Confirm that auth is piped through correctly.
-- name: 'gcr.io/$PROJECT_ID/gcloud'
-  args: ['builds', 'list']
-
-images:
-- 'gcr.io/$PROJECT_ID/gcloud'
-- 'gcr.io/$PROJECT_ID/gcloud-slim'
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
-- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
-- 'asia-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
-- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
-- 'us-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud-slim'
-
-options:
-    substitution_option: 'ALLOW_LOOSE'
-    logging: CLOUD_LOGGING_ONLY
-
-timeout: 2400s
+  - name : 'gcr.io/cloud-builders/docker'
+    args: ["build",  "-t", 'gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA',"."]
+  images: ['gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA']
+  timeout: "1600s"
