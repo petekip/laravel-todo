@@ -1,21 +1,35 @@
 steps:
-  # build the container image
-- name: 'gcr.io/cloud-builders/docker'
-  args: [
-    'build', 
-    '-t', 
-    'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}', 
-    '.'
-    ]
-  # push the container image to Container Registry
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}']
-images:
-- gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}
-
-options:
-    substitution_option: 'ALLOW_LOOSE'
-    logging: CLOUD_LOGGING_ONLY
-
-substitutions:
-    _APP_DEBUG: 'true'
+- name: 'gcr.io/cloud-builders/gsutil'
+  args:
+    - cp
+    - .env.testing
+    - .env
+- name: 'docker/compose:1.23.1'
+  args:
+    - run
+    - app
+    - composer
+    - install
+    - --optimize-autoloader
+    - --no-interaction
+    - --no-ansi
+    - --no-progress
+    - --no-scripts
+    - --prefer-dist
+- name: 'docker/compose:1.23.1'
+  args:
+    - run
+    - app
+    - vendor/bin/phpunit
+    - --no-coverage
+- name: 'gcr.io/cloud-builders/gsutil'
+  args:
+    - cp
+    - ${_APP_YAML_CONFIG}
+    - app.yaml
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+    - app
+    - deploy
+    - --no-promote
+timeout: '600s'
