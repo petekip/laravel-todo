@@ -33,10 +33,3 @@ steps:
     ]
 images:
 - gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}
-
-options:
-    substitution_option: 'ALLOW_LOOSE'
-    logging: CLOUD_LOGGING_ONLY
-
-substitutions:
-    _APP_DEBUG: 'true'
