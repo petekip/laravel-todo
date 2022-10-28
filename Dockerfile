@@ -4,7 +4,7 @@ COPY . /app
 RUN composer install --no-scripts --no-autoloader && \
     composer dump-autoload --optimize
 
-FROM php:8.0-apache-stretch
+FROM php:8.1-apache
 
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
