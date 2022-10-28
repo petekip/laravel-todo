@@ -24,11 +24,7 @@ ARG GOOGLE_CLOUD_PROJECT
 RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
 
 # Install composer packages
-RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
-RUN apk update
-RUN apk upgrade
-RUN apk add bash
-RUN alias composer='php /usr/bin/composer'
+RUN composer install -n --prefer-dist
 
 RUN chown -R www-data:www-data storage bootstrap
 RUN chmod -R 777 storage bootstrap
