@@ -22,7 +22,7 @@ steps:
           - '--platform=managed'
           - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA'
           - '--region=$_DEPLOY_REGION'
-          - '--member="allUsers"'
+          - '--ingress="all"'
           - '--quiet'
       entrypoint: gcloud
 options:
