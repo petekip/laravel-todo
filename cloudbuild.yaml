@@ -39,4 +39,4 @@ options:
     logging: CLOUD_LOGGING_ONLY
 
 substitutions:
-    _APP_DEBUG: 'True'
+    _APP_DEBUG: 'TRUE'
