@@ -1,39 +1,12 @@
 steps:
     - name: 'gcr.io/cloud-builders/docker'
-      id: Install packages
-      args:
-          - 'install'
-    - name: 'gcr.io/cloud-builders/docker'
-      id: Build
-      args:
-          - 'run'
-          - 'build'
-    - name: 'bash'
-      id: Copy composer.json
-      args:
-          - 'cp'
-          - 'composer.json'
-          - './build'
-    - name: 'bash'
-      id: Copy composer.lock
-      args:
-          - 'cp'
-          - 'composer.lock'
-          - './build'
-    - name: 'bash'
-      id: Copy Dockerfile
-      args:
-          - 'cp'
-          - './Dockerfile'
-          - './build'
-    - name: 'gcr.io/cloud-builders/docker'
       id: Build docker image
       args:
           - 'build'
           - '--no-cache'
           - '-t'
           - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA'
-          - './build'
+          - '.'
     - name: 'gcr.io/cloud-builders/docker'
       id: Push docker image to cloud registry
       args:
