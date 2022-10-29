@@ -22,6 +22,8 @@ steps:
           - '--platform=managed'
           - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA'
           - '--region=$_DEPLOY_REGION'
+          - '--allow-unauthenticated=$_SERVICE_NAME'
+          - '--network=cloudbuild'
           - '--quiet'
       entrypoint: gcloud
 options:
