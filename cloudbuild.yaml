@@ -53,6 +53,7 @@ steps:
       entrypoint: gcloud
 options:
     substitutionOption: ALLOW_LOOSE
+    logging: CLOUD_LOGGING_ONLY
 substitutions:
     _SERVICE_NAME: demo
     _DEPLOY_REGION: us-central1
