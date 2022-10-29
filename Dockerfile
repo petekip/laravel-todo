@@ -24,7 +24,6 @@ ARG GOOGLE_CLOUD_PROJECT
 RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
 
 # Install composer packages
-RUN composer install -n --prefer-dist
 
 RUN chown -R www-data:www-data storage bootstrap
 RUN chmod -R 777 storage bootstrap
