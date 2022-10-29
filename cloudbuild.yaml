@@ -1,42 +1,59 @@
 steps:
-  # build the container image
-- name: 'gcr.io/cloud-builders/docker'
-  args: [
-    'build', 
-    '-t', 
-    'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}', 
-    '.'
-    ]
-  # push the container image to Container Registry
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}']
-  # Deploy container image to Cloud Run
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: [
-    'beta',
-    'run',
-    'deploy',
-    '--allow-unauthenticated',
-    '${_CLOUD_RUN_SERVICE}',
-    '--image',
-    'gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}',
-    '--region',
-    'us-central1',
-    '--platform',
-    'managed',
-    '--memory',
-    '256Mi',
-    '--network',
-    'cloudbuild',
-    '--update-env-vars',
-    'APP_DEBUG=${_APP_DEBUG}'
-    ]
-images:
-- gcr.io/$PROJECT_ID/${_CLOUD_RUN_SERVICE}
-
+    - name: 'gcr.io/cloud-builders/npm'
+      id: Install packages
+      args:
+          - 'install'
+    - name: 'gcr.io/cloud-builders/npm'
+      id: Build
+      args:
+          - 'run'
+          - 'build'
+    - name: 'bash'
+      id: Copy package.json
+      args:
+          - 'cp'
+          - 'package.json'
+          - './build'
+    - name: 'bash'
+      id: Copy package-lock.json
+      args:
+          - 'cp'
+          - 'package-lock.json'
+          - './build'
+    - name: 'bash'
+      id: Copy Dockerfile
+      args:
+          - 'cp'
+          - './src/Dockerfile'
+          - './build'
+    - name: 'gcr.io/cloud-builders/docker'
+      id: Build docker image
+      args:
+          - 'build'
+          - '--no-cache'
+          - '-t'
+          - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA'
+          - './build'
+    - name: 'gcr.io/cloud-builders/docker'
+      id: Push docker image to cloud registry
+      args:
+          - 'push'
+          - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA'
+    - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+      id: Deploy image to cloud run
+      args:
+          - run
+          - services
+          - update
+          - $_SERVICE_NAME
+          - '--platform=managed'
+          - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA'
+          - '--region=$_DEPLOY_REGION'
+          - '--quiet'
+      entrypoint: gcloud
 options:
-    substitution_option: 'ALLOW_LOOSE'
-    logging: CLOUD_LOGGING_ONLY
-
+    substitutionOption: ALLOW_LOOSE
 substitutions:
-    _APP_DEBUG: 'TRUE'
+    _SERVICE_NAME: demo
+    _DEPLOY_REGION: us-central1
+    _GCR_HOSTNAME: gcr.io
