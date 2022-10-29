@@ -24,6 +24,11 @@ ARG GOOGLE_CLOUD_PROJECT
 RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
 
 # Install composer packages
+FROM composer:2.0 as build
+WORKDIR /app
+COPY . /app
+RUN composer install --no-scripts --no-autoloader && \
+    composer dump-autoload --optimize
 
 RUN chown -R www-data:www-data storage bootstrap
 RUN chmod -R 777 storage bootstrap
