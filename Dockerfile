@@ -1,5 +1,5 @@
 #Import the image with basic ubuntu system and php along with extensions installed.
-FROM sandymadaan/php7.3-docker:0.4
+FROM sandymadaan/php8.0-docker:0.4
 
 # Copy local code to the container image.
 COPY . /var/www/html/
