@@ -1,22 +1,36 @@
+#Import the image with basic ubuntu system and php along with extensions installed.
+FROM php:8.1-apache
+
+# Copy local code to the container image.
+COPY . /var/www/html/
+
+# Restart apache2
+RUN service apache2 restart
+
+# Use the PORT environment variable in Apache configuration files.
+RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
+
+
+# Authorise .htaccess files
+RUN sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+
+RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+COPY .env.example .env
+
+ARG GOOGLE_CLOUD_PROJECT
+
+RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
+
+# Install composer packages
 FROM composer:2.0 as build
-COPY . /app/
-RUN composer install --prefer-dist --no-dev --optimize-autoloader --no-interaction
+WORKDIR /app
+COPY . /app
+RUN composer install --no-scripts --no-autoloader && \
+    composer dump-autoload --optimize
 
-FROM php:8.0-apache-buster as production
+RUN chown -R www-data:www-data storage bootstrap
+RUN chmod -R 777 storage bootstrap
 
-ENV APP_ENV=production
-ENV APP_DEBUG=false
-
-RUN docker-php-ext-configure opcache --enable-opcache && \
-    docker-php-ext-install pdo pdo_mysql
-COPY docker/php/conf.d/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
-
-COPY --from=build /app /var/www/html
-COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
-COPY .env.prod /var/www/html/.env
-
-RUN php artisan config:cache && \
-    php artisan route:cache && \
-    chmod 777 -R /var/www/html/storage/ && \
-    chown -R www-data:www-data /var/www/ && \
-    a2enmod rewrite
+RUN php artisan key:generate
