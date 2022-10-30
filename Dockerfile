@@ -2,7 +2,7 @@
 FROM php:8.1-apache
 
 # Copy local code to the container image.
-COPY . /var/www/html/
+COPY . /var/www/
 
 # Restart apache2
 RUN service apache2 restart
@@ -26,7 +26,7 @@ RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
 # Install Composer
 COPY . .
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-COPY composer.* . /var/www/html/
+#COPY composer.* . /var/www/html/
 
 
 RUN chown -R www-data:www-data storage bootstrap
