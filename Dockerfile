@@ -31,9 +31,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 #RUN composer install --no-scripts --no-autoloader
 
-COPY . .
-RUN chmod +x artisan
-RUN php artisan key:generate
+#RUN chmod +x artisan
+
 #RUN composer dump-autoload --optimize && composer run-script post-install-cmd
 
 
