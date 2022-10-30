@@ -33,7 +33,6 @@ RUN a2enmod rewrite headers
 # 4. start with base php config, then add extensions
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 RUN docker-php-ext-install \
-    bz2 \
     intl \
     iconv \
     bcmath \
