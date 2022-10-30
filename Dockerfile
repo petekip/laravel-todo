@@ -1,6 +1,12 @@
 #Import the image with basic ubuntu system and php along with extensions installed.
 FROM php:8.1-apache
 
+# Copy composer.lock and composer.json into the working directory
+COPY composer.lock composer.json /var/www/html/
+
+# Set working directory
+WORKDIR /var/www/html/
+
 # Copy local code to the container image.
 COPY . /var/www/html/
 
