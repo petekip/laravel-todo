@@ -2,7 +2,7 @@
 FROM php:8.1-apache
 
 # Copy local code to the container image.
-COPY . /var/www/
+COPY . /var/www/html/
 
 # Restart apache2
 RUN service apache2 restart
@@ -25,8 +25,17 @@ RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
 
 # Install Composer
 COPY . .
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-#COPY composer.* . /var/www/html/
+COPY composer.json composer.lock ./
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --no-autoloader
+
+
+#RUN composer install --no-scripts --no-autoloader
+
+COPY . .
+RUN chmod +x artisan
+
+RUN composer dump-autoload --optimize && composer run-script post-install-cmd
+
 
 
 RUN chown -R www-data:www-data storage bootstrap
