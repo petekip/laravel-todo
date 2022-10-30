@@ -27,7 +27,6 @@ RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
 COPY . .
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY composer.* . /var/www/html/
-COPY vendor.* . /var/www/html/
 
 
 RUN chown -R www-data:www-data storage bootstrap
