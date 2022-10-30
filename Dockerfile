@@ -33,7 +33,6 @@ WORKDIR $WORKDIR
 COPY composer.* ./
 RUN composer install --no-autoloader
 COPY . ./
-RUN composer dump-autoload
 
 
 RUN chown -R www-data:www-data storage bootstrap
