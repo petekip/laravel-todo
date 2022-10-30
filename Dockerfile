@@ -1,6 +1,7 @@
 #Import the image with basic ubuntu system and php along with extensions installed.
 FROM php:8.1-apache
-
+ARG koech
+ARG 1000
 # Copy local code to the container image.
 COPY . /var/www/html/
 
