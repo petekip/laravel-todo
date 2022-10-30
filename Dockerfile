@@ -29,7 +29,6 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY composer.* ./var/www/html/
 RUN composer install --no-autoloader
 COPY . ./
-RUN composer dump-autoload
 
 
 RUN chown -R www-data:www-data storage bootstrap
