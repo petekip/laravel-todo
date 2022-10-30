@@ -23,21 +23,31 @@ ARG GOOGLE_CLOUD_PROJECT
 
 RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
 
-# Install composer packages
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+# 3. mod_rewrite for URL rewrite and mod_headers for .htaccess extra headers like Access-Control-Allow-Origin-
+RUN a2enmod rewrite headers
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-RUN chown -R www-data:www-data storage bootstrap
-RUN chmod -R 777 storage bootstrap
-
-COPY composer.json composer.json
-#COPY composer.lock composer.lock
-COPY . .
-RUN composer install
-RUN composer dump-autoload
-
-RUN php artisan key:generate
-RUN php artisan jwt:secret
-RUN chmod 777 -R storage
+# 4. start with base php config, then add extensions
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+RUN docker-php-ext-install \
+    bz2 \
+    intl \
+    iconv \
+    bcmath \
+    opcache \
+    calendar \
+    mbstring \
+    pdo_mysql \
+    zip
+#upload
+RUN echo "file_uploads = On\n" \
+         "memory_limit = 500M\n" \
+         "upload_max_filesize = 500M\n" \
+         "post_max_size = 500M\n" \
+         "max_execution_time = 600\n" \
+         > /usr/local/etc/php/conf.d/uploads.ini
+# 5. composer
+COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
