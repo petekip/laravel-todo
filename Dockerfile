@@ -1,7 +1,6 @@
 #Import the image with basic ubuntu system and php along with extensions installed.
 FROM php:8.1-apache
-ARG koech
-ARG 1000
+
 # Copy local code to the container image.
 COPY . /var/www/html/
 
@@ -34,14 +33,12 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Create system user to run Composer and Artisan Commands
-RUN useradd -G www-data,root -u $uid -d /home/$user $user
-RUN mkdir -p /home/$user/.composer && \
-    chown -R $user:$user /home/$user
+RUN useradd -G www-data,root -u 1000 -d /home/koech koech
+RUN mkdir -p /home/koech/.composer && \
+    chown -R koech:koech /home/koech
 
 # Set working directory
 WORKDIR /var/www/html/
-
-USER $user
 
 
 RUN chown -R www-data:www-data storage bootstrap
