@@ -25,7 +25,8 @@ RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
+COPY . .
+RUN composer dump-autoload
 # Install composer packages
 
 RUN chown -R www-data:www-data storage bootstrap
