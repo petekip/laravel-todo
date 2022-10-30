@@ -23,6 +23,9 @@ ARG GOOGLE_CLOUD_PROJECT
 
 RUN sed -ri -e 's/project_id/${GOOGLE_CLOUD_PROJECT}/g' .env
 
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 # Install composer packages
 RUN apt-get update && apt-get install -y libmcrypt-dev \
     mysql-client libmagickwand-dev --no-install-recommends \
@@ -30,8 +33,6 @@ RUN apt-get update && apt-get install -y libmcrypt-dev \
     && docker-php-ext-enable imagick \
 && docker-php-ext-install mcrypt pdo_mysql
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 RUN chown -R www-data:www-data storage bootstrap
 RUN chmod -R 777 storage bootstrap
